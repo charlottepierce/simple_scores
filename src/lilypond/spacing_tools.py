@@ -1,6 +1,6 @@
 import sys
 import os
-import Tkinter
+import Tkinter as tk
 import Image, ImageTk
 
 def add_proportional_spacing(score_text, spacing_ref):
@@ -40,22 +40,33 @@ def add_proportional_spacing(score_text, spacing_ref):
 
 	return score_text + "\\layout {\\context { \\Score proportionalNotationDuration = #(ly:make-moment 1 %s)}}" % (spacing_ref)
 
-def display_score(score_image_file):
-	"""
-	TODO: Shouldn't be in this file.
-	TODO: Check file type, probably change to PDF.
-	"""
+def typeset_score(score_file, score_file_base, output_format):
+	out_file = '.%s' %(score_file_base) # suffix is added by Lilypond
+	ly_command = 'lilypond --silent -o %s --%s %s' %(out_file, output_format, score_file)
+	os.system(ly_command)
+	out_file += '.%s' %(output_format)
+	return out_file
 
-	root = Tkinter.Tk() # create window
+def change_score(e, panel, spacing_increase, score_text, spacing_ref):
+	if spacing_increase:
+		spacing_ref.curr_spacing *= 2
+	else:
+		spacing_ref.curr_spacing /= 2
 
-	score = Image.open(score_image_file)
- 	root.geometry('%dx%d' % (score.size[0], score.size[1])) # set the size of the image window
+	print "Spacing: %d" %(spacing_ref.curr_spacing)
 
-	tk_score = ImageTk.PhotoImage(score)
- 	label_image = Tkinter.Label(root, image=tk_score) # create label from image
-	label_image.place(x=0, y=0, width=score.size[0], height=score.size[1]) # place image on window
-	root.title(score_image_file)
- 	root.mainloop() # display window until closed
+	spaced_score = add_proportional_spacing(score_text, spacing_ref.curr_spacing)
+	score_file = '.spaced_score.ly'
+	open(score_file, 'w+').write(spaced_score)
+	out_file = typeset_score(score_file, score_file, 'png')
+
+	img2 = ImageTk.PhotoImage(Image.open(out_file))
+	panel.configure(image = img2)
+	panel.image = img2
+
+class SpacingRef():
+	def __init__(self):
+		self.curr_spacing = 1
 
 if __name__ == '__main__':
 	"""
@@ -64,6 +75,7 @@ if __name__ == '__main__':
 	print ' -- Lilypond proportional spacing tool --'
 
 	output_format = 'png'
+	spacing_ref = SpacingRef()
 
 	print 'Using score ... ',
 	if len(sys.argv) < 2:
@@ -80,12 +92,16 @@ if __name__ == '__main__':
 	print 'done.'
 
 	print 'Typesetting score ... ',
-	out_file = '.%s' %(score_file_base) # suffix is added by Lilypond
-	ly_command = 'lilypond --silent -o %s --%s %s' %(out_file, output_format, score_file)
-	os.system(ly_command)
-	out_file += '.%s' %(output_format)
+	out_file = typeset_score(score_file, score_file_base, output_format)
 	print 'done (%s).' %(out_file)
 
-	display_score(out_file)
-
+	print 'Creating GUI ... ',
+	root = tk.Tk()
+	img = ImageTk.PhotoImage(Image.open(out_file))
+	panel = tk.Label(root, image=img)
+	panel.pack()
+	root.bind("i", lambda event: change_score(event, panel, True, score_text, spacing_ref))
+	root.bind("d", lambda event: change_score(event, panel, False, score_text, spacing_ref))
+	root.mainloop()
+	print 'done.'
 
