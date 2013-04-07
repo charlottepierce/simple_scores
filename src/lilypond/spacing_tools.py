@@ -40,11 +40,34 @@ def add_proportional_spacing(score_text, spacing_ref):
 
 	return score_text + "\\layout {\\context { \\Score proportionalNotationDuration = #(ly:make-moment 1 %s)}}" % (spacing_ref)
 
-def typeset_score(score_file, score_file_base, output_format):
-	out_file = '.%s' %(score_file_base) # suffix is added by Lilypond
+def typeset_score(score_file, output_format):
+	""" Typeset a score with Lilypond.
+
+	Calls the Lilypond compiler in a subprocess.
+	The typeset score is saved as a hidden (i.e., dot) file in the current directory.
+
+	args
+	----
+		score_file:
+			The file containing the Lilypond score to typeset.
+			Needs to be a full relative path.
+		output_format:
+			The format in which to save the typeset score.
+			Must be a format accepted by the Lilypond engraver (i.e., 'pdf', 'png' or 'ps').
+
+	"""
+
+	score_file_base = os.path.basename(score_file)
+
+	out_file = '%s-typeset' %(score_file_base) # suffix is added by Lilypond
+	if not out_file.startswith('.'):
+		out_file = '.%s' %(out_file) # make sure file is hidden
+
 	ly_command = 'lilypond --silent -o %s --%s %s' %(out_file, output_format, score_file)
 	os.system(ly_command)
-	out_file += '.%s' %(output_format)
+
+	out_file += '.%s' %(output_format) # append file type to output file name
+
 	return out_file
 
 def change_score(e, panel, spacing_increase, score_text, spacing_ref):
@@ -58,7 +81,7 @@ def change_score(e, panel, spacing_increase, score_text, spacing_ref):
 	spaced_score = add_proportional_spacing(score_text, spacing_ref.curr_spacing)
 	score_file = '.spaced_score.ly'
 	open(score_file, 'w+').write(spaced_score)
-	out_file = typeset_score(score_file, score_file, 'png')
+	out_file = typeset_score(score_file, 'png')
 
 	img2 = ImageTk.PhotoImage(Image.open(out_file))
 	panel.configure(image = img2)
@@ -92,7 +115,7 @@ if __name__ == '__main__':
 	print 'done.'
 
 	print 'Typesetting score ... ',
-	out_file = typeset_score(score_file, score_file_base, output_format)
+	out_file = typeset_score(score_file, output_format)
 	print 'done (%s).' %(out_file)
 
 	print 'Creating GUI ... ',
