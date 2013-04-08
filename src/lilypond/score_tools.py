@@ -1,6 +1,10 @@
 import re
 
-def remove_comments(score_file):
+from Note import Note
+
+# TODO: update for relative pitches
+
+def _remove_comments(score_file):
 	"""Remove the comments from a Lilypond score.
 
 	Assumes the comments are single line, where the comment character is
@@ -27,7 +31,7 @@ def remove_comments(score_file):
 
 	return score_text
 
-def find_note_sets(score_text):
+def _find_note_sets(score_text):
 	"""Find and return the list of note sets in the score.
 
 	Note sets are a related set of note definitions, found between curly parentheses.
@@ -48,7 +52,7 @@ def find_note_sets(score_text):
 
 	return re.findall(r'{[^}]+}', score_text.replace('\n', ' '))
 
-def create_note_lists(note_sets):
+def _create_note_lists(note_sets):
 	"""Convert each set in note_sets to a list of notes in that set.
 
 	args
@@ -64,13 +68,57 @@ def create_note_lists(note_sets):
 
 	return [re.sub(r'[{}]', '', s).strip().split() for s in note_sets]
 
+def create_note_objects(score_file):
+	"""Convert a Lilypond score into a list of Note objects.
+
+	args
+	----
+		score_file:
+			The Lilypond score to read and convert.
+
+	return
+	------
+		List of lists.
+		Each item in the list is an individual set of related notes,
+		represented as Note objects.
+
+	"""
+
+	# TODO: update for accidentals
+	# TODO: update for articulation
+
+	note_lists = _create_note_lists(_find_note_sets(_remove_comments(score_file)))
+
+	object_lists = []
+	for note_list in note_lists:
+		note_objects = []
+		# Convert each note
+		for note in note_list:
+			# Pitch
+			pitch = note[0] # pitch is always the first thing
+			# Octave
+			octave = '' # no octave
+			if '\'' in note:
+				octave = note.count('\'') * '\'' # higher octave
+			elif ',' in note:
+				octave = note.count(',') * ',' # lower octave
+			# Length
+			digits = re.findall(r'\d+', note)
+			if len(digits) > 0:
+				length = digits[0] # assume first not found in note string is the length
+
+			note_objects.append(Note(pitch, octave, length))
+
+		object_lists.append(note_objects)
+
+	return object_lists
+
 if __name__ == '__main__':
 	score_file = 'scores/Scale.ly'
 
-	score_text = remove_comments(score_file)
-	note_sets = find_note_sets(score_text)
-	note_lists = create_note_lists(note_sets)
+	note_lists = create_note_objects(score_file)
 
-	for n in note_lists:
-		print n
-
+	for note_list in note_lists:
+		for note in note_list:
+			print note,
+		print
