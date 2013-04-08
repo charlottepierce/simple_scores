@@ -1,3 +1,5 @@
+import os
+
 import Tkinter as tk
 import Image, ImageTk
 
@@ -44,6 +46,9 @@ class ScoreViewer:
 				The Tk panel on which the score is displayed.
 
 		"""
+
+		# Window close handler
+		self.root.protocol('WM_DELETE_WINDOW', self.__destroy)
 
 		# Key bindings to increase (i) and decrease (d) the spacing reference
 		self.root.bind('i', lambda event: self.__change_spacing(event, True, panel))
@@ -107,4 +112,17 @@ class ScoreViewer:
 		panel.image = spaced_score_img
 
 		print '- spacing = %d' %(self.spacing_handler.curr_spacing_ref)
+
+	def __destroy(self):
+		"""Clean up all hidden files and close the GUI.
+
+		Assumes the GUI has been closed (or triggered to close).
+
+		"""
+
+		for file in self.hidden_files:
+			if os.path.isfile(file):
+				os.remove(file)
+
+		self.root.destroy()
 
