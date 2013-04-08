@@ -133,12 +133,27 @@ def create_note_objects(score_file):
 
 	return object_lists
 
-if __name__ == '__main__':
-	score_file = 'scores/Scale.ly'
+def save_score(note_lists, out_file):
+	"""Save a score represented as a set of Note object lists.
 
-	note_lists = create_note_objects(score_file)
+	args
+	----
+		note_lists:
+			A list of lists
+			Each item in the list is an individual set of related notes,
+			represented as Note objects.
 
-	for note_list in note_lists:
-		for note in note_list:
-			print note,
-		print
+		out_file:
+			The file to save the score in.
+
+	"""
+
+	out = open(out_file, 'w+')
+	out.write('\\version \"2.16.2\"\n')
+	for note_set in note_lists:
+		out.write('{ ')
+		for note in note_set:
+			out.write('%s ' %(str(note)))
+		out.write('}')
+		out.write('\n')
+

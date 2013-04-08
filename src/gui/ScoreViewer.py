@@ -24,10 +24,18 @@ class ScoreViewer:
 
 		self.root = tk.Tk()
 		self.spacing_ref = 4
-		self.score_file = score_file
 		self.hidden_files = []
 		self.viewed = False
 		self.spacing_handler = gui.SpacingHandler(spacing_ref)
+
+		# Convert score to Note objects
+		self.note_sets = ly.score_tools.create_note_objects(score_file)
+		# Save to 'clean' score
+		self.score_file = '%s-clean.ly' %(os.path.basename(score_file).replace('.ly', ''))
+		if not self.score_file.startswith('.'):
+			self.score_file = '.%s' %(self.score_file)
+		ly.score_tools.save_score(self.note_sets, self.score_file)
+		self.hidden_files.append(self.score_file)
 
 	def __add_key_bindings(self, panel):
 		"""Add all GUI key bindings.

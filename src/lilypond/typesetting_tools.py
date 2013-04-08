@@ -19,7 +19,7 @@ def typeset_score(score_file, output_format):
 
 	score_file_base = os.path.basename(score_file)
 
-	out_file = '%s-typeset' %(score_file_base) # suffix is added by Lilypond
+	out_file = '%s-typeset' %(score_file_base.replace('.ly', '')) # suffix is added by Lilypond
 	if not out_file.startswith('.'):
 		out_file = '.%s' %(out_file) # make sure file is hidden
 
