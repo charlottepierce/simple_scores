@@ -7,8 +7,6 @@ import gui
 import lilypond as ly
 
 # TODO: find PDF viewer
-# TODO: add key bindings/handlers
-# TODO: clean up spacing_tools code
 
 class ScoreViewer:
 	def __init__(self, score_file, spacing_ref=1):
