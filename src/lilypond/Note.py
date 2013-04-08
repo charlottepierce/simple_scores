@@ -1,5 +1,5 @@
 class Note:
-	def __init__(self, pitch, octave, length):
+	def __init__(self, pitch, octave, length, accidental):
 		"""Create a new Note object.
 
 		args
@@ -16,12 +16,16 @@ class Note:
 				The length of the note in Lilypond notation.
 				i.e., where '1' is a semibreve, '2' is a minim, '8' is a quaver etc.
 
+			accidental:
+				Any accidental that should be applied to the note; 'is' sharpens, 'es' flattens.
+
 		"""
 
 		self.pitch = pitch
 		self.octave = octave
 		self.length = length
+		self.accidental = accidental
 
 	def __str__(self):
-		return self.pitch + self.octave + self.length
+		return self.pitch + self.accidental + self.octave + self.length
 

@@ -84,7 +84,6 @@ def create_note_objects(score_file):
 
 	"""
 
-	# TODO: update for accidentals
 	# TODO: update for articulation
 
 	note_lists = _create_note_lists(_find_note_sets(_remove_comments(score_file)))
@@ -106,8 +105,14 @@ def create_note_objects(score_file):
 			digits = re.findall(r'\d+', note)
 			if len(digits) > 0:
 				length = digits[0] # assume first not found in note string is the length
+			# Accidentals
+			accidentals = ''
+			if 'es' in note:
+				accidentals = note.count('es') * 'es' # flattened
+			elif 'is' in note:
+				accidentals = note.count('is') * 'is' # sharpened
 
-			note_objects.append(Note(pitch, octave, length))
+			note_objects.append(Note(pitch, octave, length, accidentals))
 
 		object_lists.append(note_objects)
 
