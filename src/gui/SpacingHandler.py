@@ -14,6 +14,42 @@ class SpacingHandler:
 
 		self.curr_spacing_ref = spacing_ref
 
+	def space_score(self, spacing, score_file):
+		"""Change the spacing of a score, re-typeset score.
+
+		Changes the spacing stored in the SpacingHandler object.
+
+		args
+		----
+			spacing:
+				The spacing reference to apply to the score.
+
+			score_file:
+				The Lilypond file containin the score to space.
+
+		return
+		------
+			File name of the newly spaced and typeset score.
+
+		"""
+
+		self.curr_spacing_ref = spacing
+		if self.curr_spacing_ref < 1:
+			self.curr_spacing_ref = 1 # make sure reference is at least 1
+
+		# Read score, add spacing
+		score_text = open(score_file).read()
+		spaced_score = ly.spacing_tools.add_proportional_spacing(score_text, self.curr_spacing_ref)
+
+		# Save spaced score temporarily and typeset
+		spaced_score_file = '.spaced_score.tmp'
+		open(spaced_score_file, 'w+').write(spaced_score)
+		typeset_score = ly.typesetting_tools.typeset_score(spaced_score_file, 'png')
+		os.remove(spaced_score_file)
+
+		return typeset_score
+
+
 	def change_spacing(self, increase, score_file):
 		"""Change the spacing reference for a score, re-typeset score.
 
@@ -41,7 +77,8 @@ class SpacingHandler:
 		else:
 			self.curr_spacing_ref /= 2
 
-		if self.curr_spacing_ref < 1: self.curr_spacing_ref = 1 # make sure reference is at least 1
+		if self.curr_spacing_ref < 1:
+			self.curr_spacing_ref = 1 # make sure reference is at least 1
 
 		# Read original score, add spacing
 		score_text = open(score_file).read()

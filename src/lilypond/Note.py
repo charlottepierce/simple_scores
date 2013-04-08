@@ -26,12 +26,12 @@ class Note:
 
 		self.pitch = pitch
 		self.octave = octave
-		self.length = length
+		self.length = int(length)
 		self.accidental = accidental
 		self.articulation = articulation
 
 	def __str__(self):
-		note_str = self.pitch + self.accidental + self.octave + self.length
+		note_str = self.pitch + self.accidental + self.octave + str(self.length)
 		if not self.articulation == '':
 			note_str += '-%s' %(self.articulation)
 

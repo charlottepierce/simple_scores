@@ -56,9 +56,11 @@ class ScoreViewer:
 		# Window close handler
 		self.root.protocol('WM_DELETE_WINDOW', self.__destroy)
 
-		# Key bindings to increase (i) and decrease (d) the spacing reference
+		# Key bindings to increase (i) and decrease (d) the spacing reference,
+		# and estimate the best spacing (n)
 		self.root.bind('i', lambda event: self.__change_spacing(event, True, panel))
 		self.root.bind('d', lambda event: self.__change_spacing(event, False, panel))
+		self.root.bind('n', lambda event: self.__normalise_spacing(event, panel))
 
 	def view(self):
 		"""Start the ScoreViewer.
@@ -110,7 +112,37 @@ class ScoreViewer:
 
 		# Change spacing, add new score image to hidden file list
 		spaced_score = self.spacing_handler.change_spacing(increase, self.score_file)
-		if spaced_score not in self.hidden_files: self.hidden_files.append(spaced_score)
+		if spaced_score not in self.hidden_files:
+			self.hidden_files.append(spaced_score)
+
+		# Add new score image to GUI
+		spaced_score_img = ImageTk.PhotoImage(Image.open(spaced_score))
+		panel.configure(image=spaced_score_img)
+		panel.image = spaced_score_img
+
+		print '- spacing = %d' %(self.spacing_handler.curr_spacing_ref)
+
+	def __normalise_spacing(self, e, panel):
+		"""Change the spacing to the best estimate for same-sized bars.
+
+		Changes the spacing, typesets the newly spaced score, and updates
+		the GUI to display the new score.
+
+		args
+		----
+			e:
+				The key event triggering the spacing change.
+
+			panel:
+				The GUI panel upon which the score is displayed.
+
+		"""
+
+		spacing_estimate = ly.spacing_tools.estimate_spacing(self.note_sets)
+
+		spaced_score = self.spacing_handler.space_score(spacing_estimate, self.score_file)
+		if spaced_score not in self.hidden_files:
+			self.hidden_files.append(spaced_score)
 
 		# Add new score image to GUI
 		spaced_score_img = ImageTk.PhotoImage(Image.open(spaced_score))
@@ -125,6 +157,8 @@ class ScoreViewer:
 		Assumes the GUI has been closed (or triggered to close).
 
 		"""
+
+		print 'Closing GUI ... '
 
 		for file in self.hidden_files:
 			if os.path.isfile(file):
