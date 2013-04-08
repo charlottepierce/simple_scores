@@ -71,6 +71,8 @@ def _create_note_lists(note_sets):
 def create_note_objects(score_file):
 	"""Convert a Lilypond score into a list of Note objects.
 
+	Assumes the Lilypond score is well-formed.
+
 	args
 	----
 		score_file:
@@ -84,7 +86,16 @@ def create_note_objects(score_file):
 
 	"""
 
-	# TODO: update for articulation
+	# TODO: add support for articulation position modifiers (i.e., ^ and _)
+	# TODO: add support for key signatures
+	# TODO: add support for dynamics
+	# TODO: add support for clefs
+	# TODO: add support for ties
+	# TODO: add support for slurs
+	# TODO: add support for bar checks
+	# TODO: add support for relative mode
+	# TODO: add support for tempo markings
+	# TODO: add support for time signatures
 
 	note_lists = _create_note_lists(_find_note_sets(_remove_comments(score_file)))
 
@@ -111,8 +122,12 @@ def create_note_objects(score_file):
 				accidentals = note.count('es') * 'es' # flattened
 			elif 'is' in note:
 				accidentals = note.count('is') * 'is' # sharpened
+			# Articulation
+			articulation = ''
+			if '-' in note:
+				articulation = note[note.index('-') + 1] # articulation mark is the first character after a dash
 
-			note_objects.append(Note(pitch, octave, length, accidentals))
+			note_objects.append(Note(pitch, octave, length, accidentals, articulation))
 
 		object_lists.append(note_objects)
 

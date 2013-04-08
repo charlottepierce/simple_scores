@@ -1,5 +1,5 @@
 class Note:
-	def __init__(self, pitch, octave, length, accidental):
+	def __init__(self, pitch, octave, length, accidental, articulation):
 		"""Create a new Note object.
 
 		args
@@ -19,13 +19,21 @@ class Note:
 			accidental:
 				Any accidental that should be applied to the note; 'is' sharpens, 'es' flattens.
 
+			articulation:
+				Any articulation mark applied to the note.
+
 		"""
 
 		self.pitch = pitch
 		self.octave = octave
 		self.length = length
 		self.accidental = accidental
+		self.articulation = articulation
 
 	def __str__(self):
-		return self.pitch + self.accidental + self.octave + self.length
+		note_str = self.pitch + self.accidental + self.octave + self.length
+		if not self.articulation == '':
+			note_str += '-%s' %(self.articulation)
+
+		return note_str
 
