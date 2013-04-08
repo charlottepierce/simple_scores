@@ -18,7 +18,6 @@ if __name__ == '__main__':
  	score_viewer = gui.ScoreViewer(score_file)
 	print 'done.'
 
-	print 'Opening score viewer ... ',
+	print 'Opening score viewer ... '
 	score_viewer.view()
-	print 'done.'
 

@@ -40,27 +40,6 @@ def add_proportional_spacing(score_text, spacing_ref):
 
 	return score_text + "\\layout {\\context { \\Score proportionalNotationDuration = #(ly:make-moment 1 %s)}}" % (spacing_ref)
 
-def change_score(e, panel, spacing_increase, score_text, spacing_ref):
-	if spacing_increase:
-		spacing_ref.curr_spacing *= 2
-	else:
-		spacing_ref.curr_spacing /= 2
-
-	print "Spacing: %d" %(spacing_ref.curr_spacing)
-
-	spaced_score = add_proportional_spacing(score_text, spacing_ref.curr_spacing)
-	score_file = '.spaced_score.ly'
-	open(score_file, 'w+').write(spaced_score)
-	out_file = typeset_score(score_file, 'png')
-
-	img2 = ImageTk.PhotoImage(Image.open(out_file))
-	panel.configure(image = img2)
-	panel.image = img2
-
-class SpacingRef():
-	def __init__(self):
-		self.curr_spacing = 1
-
 if __name__ == '__main__':
 	"""
 	TODO: Find PDF viewer.
