@@ -30,6 +30,47 @@ class Note:
 		self.accidental = accidental
 		self.articulation = articulation
 
+	def create_string(self, pitch=True, octave=True, length=True, accidental=True, articulation=True):
+		"""Create a string representing the note.
+
+		args
+		----
+			pitch:
+				Whether to include the pitch definition.
+
+			octave:
+				Whether to include the octave definition.
+
+			length:
+				Whether to include the note length definition.
+
+			accidental:
+				Whether to include any accidentals.
+
+			articulation:
+				Whether to include any articulation.
+
+		return
+		------
+			A string representation of the note with the specific elements included.
+
+		"""
+
+		note = ''
+		if pitch:
+			note += self.pitch
+		if accidental:
+			note += self.accidental
+		if octave:
+			note += self.octave
+		if length:
+			note += str(self.length)
+		if articulation:
+			if not self.articulation == '':
+				note += '-%s' %(self.articulation)
+
+		return note
+
 	def __str__(self):
 		note_str = self.pitch + self.accidental + self.octave + str(self.length)
 		if not self.articulation == '':

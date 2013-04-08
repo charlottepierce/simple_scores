@@ -27,6 +27,7 @@ class ScoreViewer:
 		self.hidden_files = []
 		self.viewed = False
 		self.spacing_handler = gui.SpacingHandler(spacing_ref)
+		self.articulation_handler = gui.ArticulationHandler('ArticulationHandler')
 
 		# Convert score to Note objects
 		self.note_sets = ly.score_tools.create_note_objects(score_file)
@@ -45,6 +46,8 @@ class ScoreViewer:
 		Key bindings:
 			i: Increase spacing reference.
 			d: Decrease spacing reference.
+			n: Normalise spacing reference using best estimate.
+			a: Toggle articulation.
 
 		args
 		----
@@ -61,6 +64,8 @@ class ScoreViewer:
 		self.root.bind('i', lambda event: self.__change_spacing(event, True, panel))
 		self.root.bind('d', lambda event: self.__change_spacing(event, False, panel))
 		self.root.bind('n', lambda event: self.__normalise_spacing(event, panel))
+		# Key binding to toggle articulation (a).
+		self.root.bind('a', lambda event: self.__toggle_articulation(event, panel))
 
 	def view(self):
 		"""Start the ScoreViewer.
@@ -117,6 +122,8 @@ class ScoreViewer:
 
 		self.__display_score(spaced_score, panel)
 
+		print '- spacing = %d' %(self.spacing_handler.curr_spacing_ref)
+
 	def __normalise_spacing(self, e, panel):
 		"""Change the spacing to the best estimate for same-sized bars.
 
@@ -141,6 +148,32 @@ class ScoreViewer:
 
 		self.__display_score(spaced_score, panel)
 
+		print '- spacing = %d' %(self.spacing_handler.curr_spacing_ref)
+
+	def __toggle_articulation(self, e, panel):
+		"""Toggle articulation of the score.
+
+		If articulation is currently visible, remove articulation.
+		If articulation can not currently be seen, make it visible.
+
+		args
+		----
+			e:
+				The key event triggering the articulation toggle.
+
+			panel:
+				The GUI panel upon which the score is displayed.
+
+		"""
+
+		score = self.articulation_handler.toggle_articulation(self.note_sets)
+		if score not in self.hidden_files:
+			self.hidden_files.append(score)
+
+		self.__display_score(score, panel)
+
+		print '- articulation = %s' %(str(self.articulation_handler.articulation_on))
+
 	def __display_score(self, score_img, panel):
 		"""Replace the current score being displayed.
 
@@ -157,8 +190,6 @@ class ScoreViewer:
 		tk_score_img = ImageTk.PhotoImage(Image.open(score_img))
 		panel.configure(image=tk_score_img)
 		panel.image = tk_score_img
-
-		print '- spacing = %d' %(self.spacing_handler.curr_spacing_ref)
 
 	def __destroy(self):
 		"""Clean up all hidden files and close the GUI.

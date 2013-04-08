@@ -133,7 +133,7 @@ def create_note_objects(score_file):
 
 	return object_lists
 
-def save_score(note_lists, out_file):
+def save_score(note_lists, out_file, articulation=True):
 	"""Save a score represented as a set of Note object lists.
 
 	args
@@ -146,6 +146,9 @@ def save_score(note_lists, out_file):
 		out_file:
 			The file to save the score in.
 
+		articulation:
+			Indicates whether articulation should be included in the saved score.
+
 	"""
 
 	out = open(out_file, 'w+')
@@ -153,7 +156,7 @@ def save_score(note_lists, out_file):
 	for note_set in note_lists:
 		out.write('{ ')
 		for note in note_set:
-			out.write('%s ' %(str(note)))
+			out.write('%s ' %(note.create_string(articulation=articulation)))
 		out.write('}')
 		out.write('\n')
 
