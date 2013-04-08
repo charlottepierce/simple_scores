@@ -115,12 +115,7 @@ class ScoreViewer:
 		if spaced_score not in self.hidden_files:
 			self.hidden_files.append(spaced_score)
 
-		# Add new score image to GUI
-		spaced_score_img = ImageTk.PhotoImage(Image.open(spaced_score))
-		panel.configure(image=spaced_score_img)
-		panel.image = spaced_score_img
-
-		print '- spacing = %d' %(self.spacing_handler.curr_spacing_ref)
+		self.__display_score(spaced_score, panel)
 
 	def __normalise_spacing(self, e, panel):
 		"""Change the spacing to the best estimate for same-sized bars.
@@ -144,10 +139,24 @@ class ScoreViewer:
 		if spaced_score not in self.hidden_files:
 			self.hidden_files.append(spaced_score)
 
-		# Add new score image to GUI
-		spaced_score_img = ImageTk.PhotoImage(Image.open(spaced_score))
-		panel.configure(image=spaced_score_img)
-		panel.image = spaced_score_img
+		self.__display_score(spaced_score, panel)
+
+	def __display_score(self, score_img, panel):
+		"""Replace the current score being displayed.
+
+		args
+		----
+			score_img:
+				The score to display.
+
+			panel:
+				The GUI panel upon which the score is displayed.
+
+		"""
+
+		tk_score_img = ImageTk.PhotoImage(Image.open(score_img))
+		panel.configure(image=tk_score_img)
+		panel.image = tk_score_img
 
 		print '- spacing = %d' %(self.spacing_handler.curr_spacing_ref)
 
