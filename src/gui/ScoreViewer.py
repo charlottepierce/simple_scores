@@ -17,24 +17,22 @@ class ScoreViewer:
 			score_file:
 				Lilypond file containing the initial score to display.
 
-			spacing_ref:
-				Initial spacing reference.
-
 		"""
 
 		self.hidden_files = []
-		self.root = tk.Tk()
-		self.viewed = False
 		self.score_modifier = gui.ScoreModifier(score_file)
 
-		# Convert score to Note objects
-		self.note_sets = ly.score_tools.create_note_objects(score_file)
-		# Save to 'clean' score
-		self.score_file = '%s-clean.ly' %(os.path.basename(score_file).replace('.ly', ''))
+		self.root = tk.Tk()
+		self.viewed = False
+
+		# Copy score to hidden tmp file - don't want to accidentally modify original
+		self.score_file = '%s.tmp' %(os.path.basename(score_file))
 		if not self.score_file.startswith('.'):
 			self.score_file = '.%s' %(self.score_file)
-		ly.score_tools.save_score(self.note_sets, self.score_file)
+
 		self.hidden_files.append(self.score_file)
+		score_text = open(score_file).read()
+		open(self.score_file, 'w+').write(score_text)
 
 	def __add_key_bindings(self, panel):
 		"""Add all GUI key bindings.
@@ -135,34 +133,6 @@ class ScoreViewer:
 
 		print '- articulation = %s' %(str(self.score_modifier.articulation_handler.articulation_on))
 
-	def view(self):
-		"""Start the ScoreViewer.
-
-		Can only be called once (subsequent calls will not be executed).
-
-		Applies the current spacing level to the given input score, adds keybindings
-		for changing the score appearance, and displays the GUI.
-
-		"""
-
-		if self.viewed:
-			return
-
-		self.viewed = True
-
-		# Typeset score
-		score_img = ly.typesetting_tools.typeset_score(self.score_file, 'png')
-		self.hidden_files.append(score_img)
-
-		# Create and add GUI image element
-		tk_score_img = ImageTk.PhotoImage(Image.open(score_img))
-		panel = tk.Label(self.root, image=tk_score_img)
-		panel.pack()
-
-		# Add key bindings and view GUI
-		self.__add_key_bindings(panel)
-		self.root.mainloop()
-
 	def __display_score(self, score, panel):
 		"""Replace the current score being displayed.
 
@@ -182,6 +152,34 @@ class ScoreViewer:
 		score_img = ImageTk.PhotoImage(Image.open(score))
 		panel.configure(image=score_img)
 		panel.image = score_img
+
+	def view(self):
+		"""Start the ScoreViewer.
+
+		Can only be called once (subsequent calls will not be executed).
+
+		Applies the current spacing level to the given input score, adds keybindings
+		for changing the score appearance, and displays the GUI.
+
+		"""
+
+		if self.viewed:
+			return
+
+		self.viewed = True
+
+		# Typeset score
+		score_img = self.score_modifier.typeset_score()
+		self.hidden_files.append(score_img)
+
+		# Create and add GUI image element
+		tk_score_img = ImageTk.PhotoImage(Image.open(score_img))
+		panel = tk.Label(self.root, image=tk_score_img)
+		panel.pack()
+
+		# Add key bindings and view GUI
+		self.__add_key_bindings(panel)
+		self.root.mainloop()
 
 	def __destroy(self):
 		"""Clean up all hidden files and close the GUI.

@@ -1,5 +1,6 @@
-import gui
+import os
 
+import gui
 import lilypond as ly
 
 class ScoreModifier:
@@ -9,6 +10,30 @@ class ScoreModifier:
 
 		self.spacing_handler = gui.SpacingHandler()
 		self.articulation_handler = gui.ArticulationHandler()
+
+	def typeset_score(self):
+		"""Typeset the score using the current settings (i.e., spacing, articulation etc.).
+
+		return
+		------
+			The typeset score.
+
+		"""
+
+		tmp_score = '.to-typeset.ly'
+
+		# Save score to temporary file
+		ly.score_tools.save_score(self.note_sets, tmp_score, self.articulation_handler.articulation_on)
+		# Apply spacing
+		score_text = open(tmp_score).read()
+		spaced_score = ly.spacing_tools.add_proportional_spacing(score_text, self.spacing_handler.curr_spacing_ref)
+
+		# Save spaced score, typeset, remove score
+		open(tmp_score, 'w+').write(spaced_score)
+		typeset_score = ly.typesetting_tools.typeset_score(tmp_score, 'png')
+		os.remove(tmp_score)
+
+		return typeset_score
 
 	def change_spacing(self, increase):
 		"""Change the spacing reference and re-typeset the score.
@@ -25,9 +50,9 @@ class ScoreModifier:
 
 		"""
 
-		score = self.spacing_handler.change_spacing(increase, self.score_file)
+		self.spacing_handler.change_spacing(increase)
 
-		return score
+		return self.typeset_score()
 
 	def normalise_spacing(self):
 		"""Change the spacing to the best estimate for same-sized bars and typesets the new score.
@@ -39,9 +64,9 @@ class ScoreModifier:
 		"""
 
 		spacing_estimate = ly.spacing_tools.estimate_spacing(self.note_sets)
-		score = self.spacing_handler.space_score(spacing_estimate, self.score_file)
+		self.spacing_handler.set_spacing_ref(spacing_estimate)
 
-		return score
+		return self.typeset_score()
 
 	def toggle_articulation(self):
 		"""Toggle articulation of the score.
@@ -55,7 +80,7 @@ class ScoreModifier:
 
 		"""
 
-		score = self.articulation_handler.toggle_articulation(self.note_sets)
+		self.articulation_handler.toggle_articulation()
 
-		return score
+		return self.typeset_score()
 
