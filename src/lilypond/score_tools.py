@@ -122,12 +122,23 @@ def create_note_objects(score_file):
 				accidentals = note.count('es') * 'es' # flattened
 			elif 'is' in note:
 				accidentals = note.count('is') * 'is' # sharpened
-			# Articulation
+			# Articulation and fingering
 			articulation = ''
-			if '-' in note:
-				articulation = note[note.index('-') + 1] # articulation mark is the first character after a dash
+			fingering = ''
+			articulation_precursors = [i for i, char in enumerate(note) if char == '-']
+			print 'Note:', note
+			print 'Articulation precursors:', articulation_precursors
+			for articulation_precursor in articulation_precursors:
+				if note[articulation_precursor - 1] == '-':
+					continue # is a tenuto, not articulation precursor
 
-			note_objects.append(Note(pitch, octave, length, accidentals, articulation))
+				articulation_mark = note[articulation_precursor + 1]
+				if articulation_mark in ['1', '2', '3', '4', '5']:
+					fingering = articulation_mark
+				else:
+					articulation = articulation_mark
+
+			note_objects.append(Note(pitch, octave, length, accidentals, articulation, fingering))
 
 		object_lists.append(note_objects)
 
