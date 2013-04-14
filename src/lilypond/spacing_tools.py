@@ -40,15 +40,21 @@ def add_proportional_spacing(score_text, spacing_ref):
 
 	return score_text + "\\layout {\\context { \\Score proportionalNotationDuration = #(ly:make-moment 1 %s)}}" % (spacing_ref)
 
-def estimate_spacing(note_sets):
+def estimate_spacing(note_sets, algorithm=3):
 	"""Estimate the optimal spacing for a score.
 
-	The spacing estimated is the fastest not found in those
-	given, multiplied by two.
+	If a valid algorithm is not selected, a spacing of 4 is returned.
 
 	args
 	----
 		note_sets:
+			List of lists of note objects.
+
+		algorithm:
+			The spacing algorithm to use.
+			1: Most frequent note x 2.
+			2: Fastest note in score.
+			3: Fastest note in score x 2.
 
 	return
 	-----
@@ -57,5 +63,15 @@ def estimate_spacing(note_sets):
 
 	"""
 
-	return max([note.length for note_set in note_sets for note in note_set]) * 2
+	if algorithm == 1:
+		notes = [note.length for note_set in note_sets for note in note_set] # expanded list of all notes in score
+		note_types = set(notes) # set of note lengths found in score
+		note_counts = [(note_type, notes.count(note_type)) for note_type in note_types] # get count of each note length
+		return max(note_counts, key=lambda item: item[1])[0] * 2
+	elif algorithm == 2:
+		return max([note.length for note_set in note_sets for note in note_set])
+	elif algorithm == 3:
+		return max([note.length for note_set in note_sets for note in note_set]) * 2
+	else:
+		return 4
 

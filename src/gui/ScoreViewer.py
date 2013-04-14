@@ -40,9 +40,13 @@ class ScoreViewer:
 		Should only be called once, before starting the GUI.
 
 		Key bindings:
+			1: Use spacing estimation algorithm 1.
+			2: Use spacing estimation algorithm 2.
+			3: Use spacing estimation algorithm 3.
+			n: Normalise spacing reference using best estimate.
 			i: Increase spacing reference.
 			d: Decrease spacing reference.
-			n: Normalise spacing reference using best estimate.
+
 			a: Toggle articulation.
 
 		args
@@ -55,6 +59,10 @@ class ScoreViewer:
 		# Window close handler
 		self.root.protocol('WM_DELETE_WINDOW', self.__destroy)
 
+		# Key bindings to change the spacing estimation algorithm to 1, 2, or 3
+		self.root.bind('1', lambda event:self.change_spacing_algorithm(event, 1))
+		self.root.bind('2', lambda event:self.change_spacing_algorithm(event, 2))
+		self.root.bind('3', lambda event:self.change_spacing_algorithm(event, 3))
 		# Key bindings to increase (i) and decrease (d) the spacing reference,
 		# and estimate the best spacing (n)
 		self.root.bind('i', lambda event: self.change_spacing(event, True, panel))
@@ -62,6 +70,25 @@ class ScoreViewer:
 		self.root.bind('n', lambda event: self.normalise_spacing(event, panel))
 		# Key binding to toggle articulation (a).
 		self.root.bind('a', lambda event: self.toggle_articulation(event, panel))
+
+	def change_spacing_algorithm(self, e, algorithm):
+		"""Change the spacing estimation algorithm.
+
+		args
+		----
+			e:
+				The key event triggering the spacing change.
+
+			algorithm:
+				The spacing algorithm to use.
+				1: Most frequent note x 2.
+				2: Fastest note in score.
+				3: Fastest note in score x 2.
+
+		"""
+
+		self.score_modifier.spacing_handler.algorithm = algorithm
+		print  '- spacing algorithm = %d' %(self.score_modifier.spacing_handler.algorithm)
 
 	def change_spacing(self, e, increase, panel):
 		"""Change the spacing reference of the score currently being viewed.

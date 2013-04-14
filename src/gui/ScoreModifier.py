@@ -63,7 +63,7 @@ class ScoreModifier:
 
 		"""
 
-		spacing_estimate = ly.spacing_tools.estimate_spacing(self.note_sets)
+		spacing_estimate = ly.spacing_tools.estimate_spacing(self.note_sets, algorithm=self.spacing_handler.algorithm)
 		self.spacing_handler.set_spacing_ref(spacing_estimate)
 
 		return self.typeset_score()
