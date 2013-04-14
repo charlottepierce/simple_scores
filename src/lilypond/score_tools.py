@@ -126,8 +126,6 @@ def create_note_objects(score_file):
 			articulation = ''
 			fingering = ''
 			articulation_precursors = [i for i, char in enumerate(note) if char == '-']
-			print 'Note:', note
-			print 'Articulation precursors:', articulation_precursors
 			for articulation_precursor in articulation_precursors:
 				if note[articulation_precursor - 1] == '-':
 					continue # is a tenuto, not articulation precursor
@@ -144,7 +142,7 @@ def create_note_objects(score_file):
 
 	return object_lists
 
-def save_score(note_lists, out_file, articulation=True):
+def save_score(note_lists, out_file, articulation=True, fingering=True):
 	"""Save a score represented as a set of Note object lists.
 
 	args
@@ -160,6 +158,9 @@ def save_score(note_lists, out_file, articulation=True):
 		articulation:
 			Indicates whether articulation should be included in the saved score.
 
+		fingering:
+			Indicates whether fingering should be included in the saved score.
+
 	"""
 
 	out = open(out_file, 'w+')
@@ -167,7 +168,7 @@ def save_score(note_lists, out_file, articulation=True):
 	for note_set in note_lists:
 		out.write('{ ')
 		for note in note_set:
-			out.write('%s ' %(note.create_string(articulation=articulation)))
+			out.write('%s ' %(note.create_string(articulation=articulation, fingering=fingering)))
 		out.write('}')
 		out.write('\n')
 

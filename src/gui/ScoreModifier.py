@@ -23,7 +23,9 @@ class ScoreModifier:
 		tmp_score = '.to-typeset.ly'
 
 		# Save score to temporary file
-		ly.score_tools.save_score(self.note_sets, tmp_score, self.articulation_handler.articulation_on)
+		articulation = self.articulation_handler.articulation_on
+		fingering = self.articulation_handler.fingering_on
+		ly.score_tools.save_score(self.note_sets, tmp_score, articulation=articulation, fingering=fingering)
 		# Apply spacing
 		score_text = open(tmp_score).read()
 		spaced_score = ly.spacing_tools.add_proportional_spacing(score_text, self.spacing_handler.curr_spacing_ref)
@@ -81,6 +83,22 @@ class ScoreModifier:
 		"""
 
 		self.articulation_handler.toggle_articulation()
+
+		return self.typeset_score()
+
+	def toggle_fingering(self):
+		"""Toggle fingering of the score.
+
+		If fingering is currently visible, remove fingering.
+		If fingering can not currently be seen, make it visible.
+
+		return
+		------
+			The spaced and typeset score.
+
+		"""
+
+		self.articulation_handler.toggle_fingering()
 
 		return self.typeset_score()
 
