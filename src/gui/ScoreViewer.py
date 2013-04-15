@@ -50,7 +50,8 @@ class ScoreViewer:
 			a: Toggle articulation.
 			f: Toggle fingering.
 
-			t: Toggle slurs.
+			t: Toggle ties.
+			s: Toggle slurs.
 
 		args
 		----
@@ -74,8 +75,9 @@ class ScoreViewer:
 		# Key binding to toggle articulation (a) and fingering (f).
 		self.root.bind('a', lambda event: self.toggle_articulation(event, panel))
 		self.root.bind('f', lambda event: self.toggle_fingering(event, panel))
-		# Key binding to toggle ties (t).
+		# Key binding to toggle ties (t) and slurs (s).
 		self.root.bind('t', lambda event: self.toggle_ties(event, panel))
+		self.root.bind('s', lambda event: self.toggle_slurs(event, panel))
 
 	def change_spacing_algorithm(self, e, algorithm):
 		"""Change the spacing estimation algorithm.
@@ -209,6 +211,28 @@ class ScoreViewer:
 		self.__display_score(score, panel)
 
 		print '- ties = %s' %(str(self.score_modifier.joins_handler.ties_on))
+
+	def toggle_slurs(self, e, panel):
+		"""Toggle display of slurs on the score.
+
+		If slurs are currently visible, remove them.
+		If slurs can not currently be seen, make them visible.
+
+		args
+		----
+			e:
+				The key event triggering the articulation toggle.
+
+			panel:
+				The GUI panel upon which the score is displayed.
+
+		"""
+
+		score = self.score_modifier.toggle_slurs()
+
+		self.__display_score(score, panel)
+
+		print '- slurs = %s' %(str(self.score_modifier.joins_handler.slurs_on))
 
 	def __display_score(self, score, panel):
 		"""Replace the current score being displayed.

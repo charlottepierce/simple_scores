@@ -1,5 +1,5 @@
 class Note:
-	def __init__(self, pitch, octave, length, accidental, articulation, fingering, tie=False):
+	def __init__(self, pitch, octave, length, accidental, articulation, fingering, slur, tie=False):
 		"""Create a new Note object.
 
 		args
@@ -25,6 +25,9 @@ class Note:
 			tie:
 				If the note is tied to the next.
 
+			slur:
+				Any slur marking applied to the note.
+
 		"""
 
 		self.pitch = pitch
@@ -34,8 +37,9 @@ class Note:
 		self.articulation = articulation
 		self.fingering = fingering
 		self.tied = tie
+		self.slur = slur
 
-	def create_string(self, pitch=True, octave=True, length=True, accidental=True, articulation=True, fingering=True, tie=True):
+	def create_string(self, pitch=True, octave=True, length=True, accidental=True, articulation=True, fingering=True, tie=True, slur=True):
 		"""Create a string representing the note.
 
 		args
@@ -61,6 +65,9 @@ class Note:
 			tie:
 				Whether to include a tie (if note has one).
 
+			slur:
+				Whether to include any slur marks.
+
 		return
 		------
 			A string representation of the note with the specific elements included.
@@ -82,6 +89,9 @@ class Note:
 		if articulation:
 			if not self.articulation == '':
 				note += '-%s' %(self.articulation)
+		if slur:
+			if not self.slur == '':
+				note += self.slur
 		if tie and self.tied:
 			note += '~'
 

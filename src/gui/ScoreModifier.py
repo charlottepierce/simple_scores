@@ -27,7 +27,8 @@ class ScoreModifier:
 		articulation = self.articulation_handler.articulation_on
 		fingering = self.articulation_handler.fingering_on
 		ties = self.joins_handler.ties_on
-		ly.score_tools.save_score(self.note_sets, tmp_score, articulation=articulation, fingering=fingering, ties=ties)
+		slurs = self.joins_handler.slurs_on
+		ly.score_tools.save_score(self.note_sets, tmp_score, articulation=articulation, fingering=fingering, ties=ties, slurs=slurs)
 		# Apply spacing
 		score_text = open(tmp_score).read()
 		spaced_score = ly.spacing_tools.add_proportional_spacing(score_text, self.spacing_handler.curr_spacing_ref)
@@ -117,6 +118,22 @@ class ScoreModifier:
 		"""
 
 		self.joins_handler.toggle_ties()
+
+		return self.typeset_score()
+
+	def toggle_slurs(self):
+		"""Toggle slurs on the score.
+
+		If slurs are currently visible, remove slurs.
+		If slurs can not currently be seen, make them visible.
+
+		return
+		------
+			The spaced and typeset score.
+
+		"""
+
+		self.joins_handler.toggle_slurs()
 
 		return self.typeset_score()
 

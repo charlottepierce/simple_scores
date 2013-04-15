@@ -91,6 +91,7 @@ def create_note_objects(score_file):
 	# TODO: add support for dynamics
 	# TODO: add support for clefs
 	# TODO: add support for slurs
+	# TODO: add support for nested slurs
 	# TODO: add support for bar checks
 	# TODO: add support for relative mode
 	# TODO: add support for tempo markings
@@ -134,18 +135,24 @@ def create_note_objects(score_file):
 					fingering = articulation_mark
 				else:
 					articulation = articulation_mark
+			# Slurs
+			slur = ''
+			if '(' in note:
+				slur = '('
+			elif ')' in note:
+				slur = ')'
 			# Ties
 			tied = False
 			if '~' in note:
 				tied = True
 
-			note_objects.append(Note(pitch, octave, length, accidentals, articulation, fingering, tie=tied))
+			note_objects.append(Note(pitch, octave, length, accidentals, articulation, fingering, slur, tie=tied))
 
 		object_lists.append(note_objects)
 
 	return object_lists
 
-def save_score(note_lists, out_file, articulation=True, fingering=True, ties=True):
+def save_score(note_lists, out_file, articulation=True, fingering=True, ties=True, slurs=True):
 	"""Save a score represented as a set of Note object lists.
 
 	args
@@ -167,6 +174,9 @@ def save_score(note_lists, out_file, articulation=True, fingering=True, ties=Tru
 		ties:
 			Indicates whether ties should be included in the saved score.
 
+		slurs:
+			Indicates whether slurs should be included in the saved score.
+
 	"""
 
 	out = open(out_file, 'w+')
@@ -174,7 +184,7 @@ def save_score(note_lists, out_file, articulation=True, fingering=True, ties=Tru
 	for note_set in note_lists:
 		out.write('{ ')
 		for note in note_set:
-			out.write('%s ' %(note.create_string(articulation=articulation, fingering=fingering, tie=ties)))
+			out.write('%s ' %(note.create_string(articulation=articulation, fingering=fingering, tie=ties, slur=slurs)))
 		out.write('}')
 		out.write('\n')
 
