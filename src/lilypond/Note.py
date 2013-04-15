@@ -1,5 +1,5 @@
 class Note:
-	def __init__(self, pitch, octave, length, accidental, articulation, fingering):
+	def __init__(self, pitch, octave, length, accidental, articulation, fingering, tie=False):
 		"""Create a new Note object.
 
 		args
@@ -22,6 +22,9 @@ class Note:
 			articulation:
 				Any articulation mark applied to the note.
 
+			tie:
+				If the note is tied to the next.
+
 		"""
 
 		self.pitch = pitch
@@ -30,8 +33,9 @@ class Note:
 		self.accidental = accidental
 		self.articulation = articulation
 		self.fingering = fingering
+		self.tied = tie
 
-	def create_string(self, pitch=True, octave=True, length=True, accidental=True, articulation=True, fingering=True):
+	def create_string(self, pitch=True, octave=True, length=True, accidental=True, articulation=True, fingering=True, tie=True):
 		"""Create a string representing the note.
 
 		args
@@ -53,6 +57,10 @@ class Note:
 
 			fingering:
 				Whether to include any fingering marks.
+
+			tie:
+				Whether to include a tie (if note has one).
+
 		return
 		------
 			A string representation of the note with the specific elements included.
@@ -74,6 +82,8 @@ class Note:
 		if articulation:
 			if not self.articulation == '':
 				note += '-%s' %(self.articulation)
+		if tie and self.tied:
+			note += '~'
 
 		return note
 
@@ -83,6 +93,8 @@ class Note:
 			note_str += '-%s' %(self.fingering)
 		if not self.articulation == '':
 			note_str += '-%s' %(self.articulation)
+		if self.tied:
+			note_str += '~'
 
 		return note_str
 

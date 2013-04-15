@@ -135,8 +135,12 @@ def create_note_objects(score_file):
 					fingering = articulation_mark
 				else:
 					articulation = articulation_mark
+			# Ties
+			tied = False
+			if '~' in note:
+				tied = True
 
-			note_objects.append(Note(pitch, octave, length, accidentals, articulation, fingering))
+			note_objects.append(Note(pitch, octave, length, accidentals, articulation, fingering, tie=tied))
 
 		object_lists.append(note_objects)
 
