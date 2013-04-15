@@ -40,6 +40,8 @@ class ScoreViewer:
 		Should only be called once, before starting the GUI.
 
 		Key bindings:
+			r: Reset score (remove spacing modifications, add all articuation).
+
 			1: Use spacing estimation algorithm 1.
 			2: Use spacing estimation algorithm 2.
 			3: Use spacing estimation algorithm 3.
@@ -63,6 +65,8 @@ class ScoreViewer:
 		# Window close handler
 		self.root.protocol('WM_DELETE_WINDOW', self.__destroy)
 
+		# Key binding to reset (r) the score.
+		self.root.bind('r', lambda event:self.reset_score(event, panel))
 		# Key bindings to change the spacing estimation algorithm to 1, 2, or 3
 		self.root.bind('1', lambda event:self.change_spacing_algorithm(event, 1))
 		self.root.bind('2', lambda event:self.change_spacing_algorithm(event, 2))
@@ -78,6 +82,24 @@ class ScoreViewer:
 		# Key binding to toggle ties (t) and slurs (s).
 		self.root.bind('t', lambda event: self.toggle_ties(event, panel))
 		self.root.bind('s', lambda event: self.toggle_slurs(event, panel))
+
+	def reset_score(self, e, panel):
+		"""Reset the score - remove any spacing modifications and make all elements visible.
+
+		args
+		----
+			e:
+				The key event triggering the spacing change.
+
+			panel:
+				The GUI panel upon which the score is displayed.
+
+		"""
+
+		score = self.score_modifier.reset_score()
+
+		self.__display_score(score, panel)
+		print ' - score reset'
 
 	def change_spacing_algorithm(self, e, algorithm):
 		"""Change the spacing estimation algorithm.

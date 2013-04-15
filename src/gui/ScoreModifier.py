@@ -8,9 +8,25 @@ class ScoreModifier:
 		self.score_file = score_file
 		self.note_sets = ly.score_tools.create_note_objects(score_file)
 
-		self.spacing_handler = gui.SpacingHandler()
+		self.spacing_handler = gui.SpacingHandler(spacing_on=False)
 		self.articulation_handler = gui.ArticulationHandler()
 		self.joins_handler = gui.JoinsHandler()
+
+	def reset_score(self):
+		"""Reset the score - remove spacing modifications and make all elements visible."""
+
+		self.spacing_handler.spacing_on = False
+		self.articulation_handler.articulation_on = True
+		self.articulation_handler.fingering_on = True
+		self.joins_handler.ties_on = True
+		self.joins_handler.slurs_on = True
+
+		score = self.typeset_score()
+
+		self.spacing_handler.spacing_on = True
+		self.spacing_handler.set_spacing_ref(1)
+
+		return score
 
 	def typeset_score(self):
 		"""Typeset the score using the current settings (i.e., spacing, articulation etc.).
@@ -29,9 +45,12 @@ class ScoreModifier:
 		ties = self.joins_handler.ties_on
 		slurs = self.joins_handler.slurs_on
 		ly.score_tools.save_score(self.note_sets, tmp_score, articulation=articulation, fingering=fingering, ties=ties, slurs=slurs)
+
 		# Apply spacing
 		score_text = open(tmp_score).read()
-		spaced_score = ly.spacing_tools.add_proportional_spacing(score_text, self.spacing_handler.curr_spacing_ref)
+		spaced_score = score_text
+		if self.spacing_handler.spacing_on:
+			spaced_score = ly.spacing_tools.add_proportional_spacing(score_text, self.spacing_handler.curr_spacing_ref)
 
 		# Save spaced score, typeset, remove score
 		open(tmp_score, 'w+').write(spaced_score)
@@ -56,6 +75,7 @@ class ScoreModifier:
 		"""
 
 		self.spacing_handler.change_spacing(increase)
+		self.spacing_handler.spacing_on = True
 
 		return self.typeset_score()
 
@@ -70,6 +90,8 @@ class ScoreModifier:
 
 		spacing_estimate = ly.spacing_tools.estimate_spacing(self.note_sets, algorithm=self.spacing_handler.algorithm)
 		self.spacing_handler.set_spacing_ref(spacing_estimate)
+
+		self.spacing_handler.spacing_on = True
 
 		return self.typeset_score()
 

@@ -3,17 +3,25 @@ import os
 import lilypond as ly
 
 class SpacingHandler:
-	def __init__(self, algorithm=3, spacing_ref=4):
+	def __init__(self, spacing_on=True, algorithm=3, spacing_ref=4):
 		"""Create a SpacingHandler object.
 
 		args
 		----
+			spacing_on:
+				The initial value for spacing.
+
+			algorithm:
+				The initial spacing algorithm.
+
 			spacing_ref:
 				The initial spacing reference.
+
 		"""
 
 		self.curr_spacing_ref = spacing_ref
 		self.algorithm = algorithm
+		self.spacing_on = spacing_on
 
 	def set_spacing_ref(self, spacing_ref):
 		"""Change the spacing reference.
