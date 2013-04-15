@@ -78,6 +78,20 @@ class ScoreModifier:
 
 		self.complexity_handler.change_complexity(increase)
 
+		# Retrieve and apply complexity settings
+		settings = self.complexity_handler.retrieve_complexity_settings()
+
+		self.articulation_handler.articulation_on = settings['articulation']
+		self.articulation_handler.fingering_on = settings['fingering']
+
+		self.joins_handler.ties_on = settings['ties']
+		self.joins_handler.slurs_on = settings['slurs']
+
+		self.spacing_handler.spacing_on = settings['spacing']
+		if self.spacing_handler.spacing_on:
+			spacing_estimate = ly.spacing_tools.estimate_spacing(self.note_sets, algorithm=self.spacing_handler.algorithm)
+			self.spacing_handler.set_spacing_ref(spacing_estimate)
+
 		return self.typeset_score()
 
 	def change_spacing(self, increase):
