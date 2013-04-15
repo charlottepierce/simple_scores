@@ -22,8 +22,8 @@
 }
 
 {
-	c'32 d' e' f' g' a' b' c''
-	c'' b' a' g' f' e' d' c'
+	c'32( d' e' f' g' a' b' c'')~
+	c''( b' a' g' f' e' d' c')
 	c' d' e' f' g' a' b' c''
 	c'' b' a' g' f' e' d' c'
 }
