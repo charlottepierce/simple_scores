@@ -90,7 +90,6 @@ def create_note_objects(score_file):
 	# TODO: add support for key signatures
 	# TODO: add support for dynamics
 	# TODO: add support for clefs
-	# TODO: add support for ties
 	# TODO: add support for slurs
 	# TODO: add support for bar checks
 	# TODO: add support for relative mode
@@ -146,7 +145,7 @@ def create_note_objects(score_file):
 
 	return object_lists
 
-def save_score(note_lists, out_file, articulation=True, fingering=True):
+def save_score(note_lists, out_file, articulation=True, fingering=True, ties=True):
 	"""Save a score represented as a set of Note object lists.
 
 	args
@@ -165,6 +164,9 @@ def save_score(note_lists, out_file, articulation=True, fingering=True):
 		fingering:
 			Indicates whether fingering should be included in the saved score.
 
+		ties:
+			Indicates whether ties should be included in the saved score.
+
 	"""
 
 	out = open(out_file, 'w+')
@@ -172,7 +174,7 @@ def save_score(note_lists, out_file, articulation=True, fingering=True):
 	for note_set in note_lists:
 		out.write('{ ')
 		for note in note_set:
-			out.write('%s ' %(note.create_string(articulation=articulation, fingering=fingering)))
+			out.write('%s ' %(note.create_string(articulation=articulation, fingering=fingering, tie=ties)))
 		out.write('}')
 		out.write('\n')
 

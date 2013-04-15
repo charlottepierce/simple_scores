@@ -13,6 +13,7 @@ class ArticulationHandler:
 
 			fingering_on:
 				The initial state for fingering marks.
+
 		"""
 
 		self.articulation_on = articulation_on

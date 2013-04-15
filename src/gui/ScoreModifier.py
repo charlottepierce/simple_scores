@@ -10,6 +10,7 @@ class ScoreModifier:
 
 		self.spacing_handler = gui.SpacingHandler()
 		self.articulation_handler = gui.ArticulationHandler()
+		self.joins_handler = gui.JoinsHandler()
 
 	def typeset_score(self):
 		"""Typeset the score using the current settings (i.e., spacing, articulation etc.).
@@ -25,7 +26,8 @@ class ScoreModifier:
 		# Save score to temporary file
 		articulation = self.articulation_handler.articulation_on
 		fingering = self.articulation_handler.fingering_on
-		ly.score_tools.save_score(self.note_sets, tmp_score, articulation=articulation, fingering=fingering)
+		ties = self.joins_handler.ties_on
+		ly.score_tools.save_score(self.note_sets, tmp_score, articulation=articulation, fingering=fingering, ties=ties)
 		# Apply spacing
 		score_text = open(tmp_score).read()
 		spaced_score = ly.spacing_tools.add_proportional_spacing(score_text, self.spacing_handler.curr_spacing_ref)
@@ -99,6 +101,22 @@ class ScoreModifier:
 		"""
 
 		self.articulation_handler.toggle_fingering()
+
+		return self.typeset_score()
+
+	def toggle_ties(self):
+		"""Toggle ties on the score.
+
+		If ties are currently visible, remove ties.
+		If ties can not currently be seen, make them visible.
+
+		return
+		------
+			The spaced and typeset score.
+
+		"""
+
+		self.joins_handler.toggle_ties()
 
 		return self.typeset_score()
 
