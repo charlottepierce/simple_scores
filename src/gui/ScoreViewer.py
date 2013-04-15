@@ -55,6 +55,9 @@ class ScoreViewer:
 			t: Toggle ties.
 			s: Toggle slurs.
 
+			+: Increase score complexity.
+			-: Decrease score complexity.
+
 		args
 		----
 			panel:
@@ -79,9 +82,12 @@ class ScoreViewer:
 		# Key binding to toggle articulation (a) and fingering (f).
 		self.root.bind('a', lambda event: self.toggle_articulation(event, panel))
 		self.root.bind('f', lambda event: self.toggle_fingering(event, panel))
-		# Key binding to toggle ties (t) and slurs (s).
+		# Key bindings to toggle ties (t) and slurs (s).
 		self.root.bind('t', lambda event: self.toggle_ties(event, panel))
 		self.root.bind('s', lambda event: self.toggle_slurs(event, panel))
+		# Key bindings to increase (+) and decrease (-) score complexity.
+		self.root.bind('+', lambda event: self.change_complexity(event, panel, True))
+		self.root.bind('-', lambda event: self.change_complexity(event, panel, False))
 
 	def reset_score(self, e, panel):
 		"""Reset the score - remove any spacing modifications and make all elements visible.
@@ -100,6 +106,28 @@ class ScoreViewer:
 
 		self.__display_score(score, panel)
 		print ' - score reset'
+
+	def change_complexity(self, e, panel, increase):
+		"""Change the score complexity.
+
+		args
+		----
+			e:
+				The key event triggering the spacing change.
+
+			panel:
+				The GUI panel upon which the score is displayed.
+
+			increase:
+				True if the complexity should increase, otherwise false.
+
+		"""
+
+		score = self.score_modifier.change_complexity(increase)
+
+		self.__display_score(score, panel)
+
+		print '- complexity = %d' %(self.score_modifier.complexity_handler.curr_complexity)
 
 	def change_spacing_algorithm(self, e, algorithm):
 		"""Change the spacing estimation algorithm.

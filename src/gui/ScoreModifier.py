@@ -8,6 +8,7 @@ class ScoreModifier:
 		self.score_file = score_file
 		self.note_sets = ly.score_tools.create_note_objects(score_file)
 
+		self.complexity_handler = gui.ComplexityHandler()
 		self.spacing_handler = gui.SpacingHandler(spacing_on=False)
 		self.articulation_handler = gui.ArticulationHandler()
 		self.joins_handler = gui.JoinsHandler()
@@ -23,6 +24,7 @@ class ScoreModifier:
 
 		score = self.typeset_score()
 
+		self.complexity_handler.curr_complexity = 0
 		self.spacing_handler.spacing_on = True
 		self.spacing_handler.set_spacing_ref(1)
 
@@ -58,6 +60,25 @@ class ScoreModifier:
 		os.remove(tmp_score)
 
 		return typeset_score
+
+	def change_complexity(self, increase):
+		"""Change the score complexity and re-typeset the score.
+
+		args
+		----
+			increase:
+				If true, the complexity is incremented by 1.
+				If true, the complexity is decremented by 1.
+
+		return
+		------
+			The spaced and typeset score.
+
+		"""
+
+		self.complexity_handler.change_complexity(increase)
+
+		return self.typeset_score()
 
 	def change_spacing(self, increase):
 		"""Change the spacing reference and re-typeset the score.
