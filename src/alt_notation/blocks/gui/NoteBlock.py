@@ -1,7 +1,11 @@
 import pyglet
 
+# import lilypond as ly
+
 class NoteBlock(pyglet.sprite.Sprite):
-	def __init__(self, batch, x=100, y=100, width=100, height=100, color=(255, 255, 255, 255)):
+	height = 15 # consistent height for note blocks
+
+	def __init__(self, batch, x=100, y=100, width=100, color=(255, 255, 255, 255)):
 		"""Create a NoteBlock object.
 
 		args
@@ -28,7 +32,7 @@ class NoteBlock(pyglet.sprite.Sprite):
 
 		# build an image for the block
 		pattern = pyglet.image.SolidColorImagePattern(color)
-		image = pyglet.image.create(width, height, pattern)
+		image = pyglet.image.create(width, NoteBlock.height, pattern)
 
 		# create sprite, add to nominated batch renderer
 		pyglet.sprite.Sprite.__init__(self, image, x, y, batch=batch)

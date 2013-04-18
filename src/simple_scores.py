@@ -1,6 +1,7 @@
 import sys
 
 import gui
+import alt_notation.blocks.gui as blocks
 
 if __name__ == '__main__':
 	print ' -- Simple Scores -- '
@@ -20,4 +21,7 @@ if __name__ == '__main__':
 
 	print 'Opening score viewer ... '
 	score_viewer.view()
+
+# 	blocks.BlockWindow()
+# 	pyglet.app.run()
 

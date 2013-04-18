@@ -19,10 +19,12 @@ class BlockWindow(pyglet.window.Window):
 
 		pyglet.window.Window.__init__(self, width=width, height=height)
 
+		self.notes = []
+
 		self.batch = pyglet.graphics.Batch() # batch renderer
 		pyglet.clock.schedule_interval(self.update, 1.0/60.0) # call update 60 times a second
 
-		self.note = gui.NoteBlock(self.batch, x=200, y=200, width=100, height=100, color=(255, 255, 255, 150))
+		self.notes.append(gui.NoteBlock(self.batch, x=200, y=200, width=100, color=(255, 255, 255, 150)))
 
 	def update(self, dt):
 		"""Update the window.
@@ -35,7 +37,7 @@ class BlockWindow(pyglet.window.Window):
 
 		print 'Updating game window'
 		print 'dt:', dt
-		self.note.x += dt
+		self.note.x += 1
 
 	def on_draw(self):
 		"""Window drawing.
@@ -43,6 +45,7 @@ class BlockWindow(pyglet.window.Window):
 		Clear the window and draw everything assigned to the windows batch renderer.
 
 		"""
+
 		self.clear()
 		self.batch.draw()
 
