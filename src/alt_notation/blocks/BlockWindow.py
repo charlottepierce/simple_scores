@@ -1,6 +1,6 @@
 import pyglet
 
-import gui
+from alt_notation.blocks.NoteBlock import NoteBlock
 
 class BlockWindow(pyglet.window.Window):
 	def __init__(self, width, height):
@@ -24,7 +24,7 @@ class BlockWindow(pyglet.window.Window):
 		self.batch = pyglet.graphics.Batch() # batch renderer
 		pyglet.clock.schedule_interval(self.update, 1.0/60.0) # call update 60 times a second
 
-		self.notes.append(gui.NoteBlock(self.batch, x=200, y=200, width=100, color=(255, 255, 255, 150)))
+		self.notes.append(NoteBlock(self.batch, x=200, y=200, width=100, color=(255, 255, 255, 150)))
 
 	def update(self, dt):
 		"""Update the window.
@@ -37,7 +37,7 @@ class BlockWindow(pyglet.window.Window):
 
 		print 'Updating game window'
 		print 'dt:', dt
-		self.note.x += 1
+		self.notes[0].x += 1
 
 	def on_draw(self):
 		"""Window drawing.
