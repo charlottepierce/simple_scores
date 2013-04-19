@@ -1,7 +1,5 @@
 import pyglet
 
-# import lilypond as ly
-
 class NoteBlock(pyglet.sprite.Sprite):
 	height = 15 # consistent height for note blocks
 

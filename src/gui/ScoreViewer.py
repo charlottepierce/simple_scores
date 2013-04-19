@@ -5,6 +5,7 @@ import Image, ImageTk
 
 import gui
 import lilypond as ly
+import alt_notation.blocks as blocks
 
 # TODO: find PDF viewer
 
@@ -21,6 +22,10 @@ class ScoreViewer:
 
 		self.hidden_files = []
 		self.score_modifier = gui.ScoreModifier(score_file)
+
+		# Prepare for block notation, but do not display yet
+		# TODO: dynamically set window height according to score?
+		self.block_window = blocks.BlockWindow(width=500, height=500, note_sets=self.score_modifier.note_sets)
 
 		self.root = tk.Tk()
 		self.viewed = False
@@ -40,6 +45,8 @@ class ScoreViewer:
 		Should only be called once, before starting the GUI.
 
 		Key bindings:
+			b: Toggle visibility of block notation.
+
 			r: Reset score (remove spacing modifications, add all articuation).
 
 			1: Use spacing estimation algorithm 1.
@@ -68,12 +75,14 @@ class ScoreViewer:
 		# Window close handler
 		self.root.protocol('WM_DELETE_WINDOW', self.__destroy)
 
+		# Key binding to toggle visibility block notation (b).
+		self.root.bind('b', lambda event: self.toggle_block_window())
 		# Key binding to reset (r) the score.
-		self.root.bind('r', lambda event:self.reset_score(event, panel))
+		self.root.bind('r', lambda event: self.reset_score(event, panel))
 		# Key bindings to change the spacing estimation algorithm to 1, 2, or 3
-		self.root.bind('1', lambda event:self.change_spacing_algorithm(event, 1))
-		self.root.bind('2', lambda event:self.change_spacing_algorithm(event, 2))
-		self.root.bind('3', lambda event:self.change_spacing_algorithm(event, 3))
+		self.root.bind('1', lambda event: self.change_spacing_algorithm(event, 1))
+		self.root.bind('2', lambda event: self.change_spacing_algorithm(event, 2))
+		self.root.bind('3', lambda event: self.change_spacing_algorithm(event, 3))
 		# Key bindings to increase (i) and decrease (d) the spacing reference,
 		# and estimate the best spacing (n)
 		self.root.bind('i', lambda event: self.change_spacing(event, True, panel))
@@ -88,6 +97,11 @@ class ScoreViewer:
 		# Key bindings to increase (+) and decrease (-) score complexity.
 		self.root.bind('+', lambda event: self.change_complexity(event, panel, True))
 		self.root.bind('-', lambda event: self.change_complexity(event, panel, False))
+
+	def toggle_block_window(self):
+		"""Toggle the visibility of the block notation window."""
+
+		self.block_window.toggle_visibility()
 
 	def reset_score(self, e, panel):
 		"""Reset the score - remove any spacing modifications and make all elements visible.
