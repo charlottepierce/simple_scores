@@ -3,7 +3,7 @@ import pyglet
 class NoteBlock(pyglet.sprite.Sprite):
 	HEIGHT = 20 # consistent height for note blocks
 
-	def __init__(self, batch, note, x=100, y=100, width=100, color=(255, 255, 255, 255)):
+	def __init__(self, batch, note, x=100, y=100, width=100, color=(255, 255, 255, 100)):
 		"""Create a NoteBlock object.
 
 		args

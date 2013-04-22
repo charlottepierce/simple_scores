@@ -31,14 +31,20 @@ class BlockWindow(pyglet.window.Window):
 
 		pyglet.window.Window.__init__(self, width=width, height=height, visible=False)
 
+		# create note blocks and set up to draw
 		self.note_batch = pyglet.graphics.Batch() # batch renderer for note blocks
-
 		self.note_sets = note_sets
 		self.note_blocks = util.create_note_blocks(self.note_batch, self.note_sets, semibreve_size=250.0)
 		self._init_x_locs()
 
+		# create staff lines, set up to draw
 		self.staff_batch = pyglet.graphics.Batch() # batch renderer for staff lines
 		self.staff_lines = self._create_staff_lines(self.staff_batch)
+
+		# create left margin line
+		pattern = pyglet.image.SolidColorImagePattern((215, 196, 196, 200))
+		image = pyglet.image.create(1, self.height, pattern)
+		self.left_margin = pyglet.sprite.Sprite(image, BlockWindow.LEFT_MARGIN, 0)
 
 		pyglet.clock.schedule_interval(self.update, 1.0/60.0) # call update 60 times a second
 
@@ -149,6 +155,9 @@ class BlockWindow(pyglet.window.Window):
 		"""
 
 		self.clear()
+
+		self.left_margin.draw()
+
 		for line in self.staff_lines:
 			line.label.draw()
 
