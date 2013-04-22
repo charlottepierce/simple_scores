@@ -3,7 +3,7 @@ import pyglet
 class StaffLine(pyglet.sprite.Sprite):
 	HEIGHT = 1
 
-	def __init__(self, batch, y, width, color=(215, 196, 196, 50)):
+	def __init__(self, batch, y, width, label, color=(215, 196, 196, 50), label_color=(215, 196, 196, 200)):
 		"""Create a new StaffLine object.
 
 		x is assumed to be zero.
@@ -22,6 +22,7 @@ class StaffLine(pyglet.sprite.Sprite):
 
 			color:
 				The color of the line, as a RGBA tuple.
+				Default is a light, transparent grey.
 
 		"""
 
@@ -30,5 +31,7 @@ class StaffLine(pyglet.sprite.Sprite):
 		image = pyglet.image.create(width, StaffLine.HEIGHT, pattern)
 
 		# create sprite, add to renderer
-		pyglet.sprite.Sprite.__init__(self, image, 0, y, batch=batch)
+		pyglet.sprite.Sprite.__init__(self, image, 10, y, batch=batch)
+
+		self.label = pyglet.text.Label(label, font_size=12, x=self.x, y=(self.y + 4), color=label_color)
 

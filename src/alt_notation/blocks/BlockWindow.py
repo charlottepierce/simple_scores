@@ -59,17 +59,29 @@ class BlockWindow(pyglet.window.Window):
 	def _create_staff_lines(self, batch):
 		"""Create the staff lines for the score."""
 
+		pitches = ('c', 'd', 'e', 'f', 'g', 'a', 'b')
+
 		result = []
 		# Middle and above
 		y_pos = self.height / 2
+		pitch = pitches.index(self.note_blocks[0].note.pitch) # first pitch
 		while y_pos <= self.height:
-			result.append(StaffLine(batch, y_pos, self.width))
+			result.append(StaffLine(batch, y_pos, self.width, pitches[pitch]))
 			y_pos += NoteBlock.HEIGHT
+			pitch += 1
+			if pitch >= len(pitches):
+				pitch = 0
 		# Below middle
 		y_pos = self.height / 2
+		pitch = pitches.index(self.note_blocks[0].note.pitch) - 1 # first pitch - 1
+		if pitch < 0:
+			pitch = len(pitches) - 1
 		while y_pos >= 0:
 			y_pos -= NoteBlock.HEIGHT
-			result.append(StaffLine(batch, y_pos, self.width))
+			result.append(StaffLine(batch, y_pos, self.width, pitches[pitch]))
+			pitch -= 1
+			if pitch < 0:
+				pitch = len(pitches) - 1
 
 		return result
 
@@ -137,6 +149,9 @@ class BlockWindow(pyglet.window.Window):
 		"""
 
 		self.clear()
+		for line in self.staff_lines:
+			line.label.draw()
+
 		self.staff_batch.draw()
 		self.note_batch.draw()
 
