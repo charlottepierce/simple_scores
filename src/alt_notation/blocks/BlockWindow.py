@@ -34,8 +34,23 @@ class BlockWindow(pyglet.window.Window):
 
 		self.note_sets = note_sets
 		self.note_blocks = util.create_note_blocks(self.batch, self.note_sets, semibreve_size=250.0)
+		self._init_x_locs()
 
 		pyglet.clock.schedule_interval(self.update, 1.0/60.0) # call update 60 times a second
+
+	def _init_x_locs(self):
+		"""Initialise the x locations for each note block."""
+
+		for i in range(len(self.note_blocks)):
+			note_block = self.note_blocks[i]
+			# if first block, place at the left margin
+			if i == 0:
+				note_block.x = BlockWindow.LEFT_MARGIN
+				continue
+
+			# not first block - offset position with previous block
+			prev = self.note_blocks[i - 1]
+			note_block.x = prev.x + prev.width
 
 	def toggle_visibility(self):
 		"""Toggle the visibility of the block window.
@@ -60,16 +75,9 @@ class BlockWindow(pyglet.window.Window):
 		print 'dt:', dt
 
 		# update horizontal position of each block
-		for i in range(len(self.note_blocks)):
-			note_block = self.note_blocks[i]
-			# if first block, place at x = 0
-			if i == 0:
-				note_block.x = BlockWindow.LEFT_MARGIN
-				continue
-
-			# not first block - offset position with previous block
-			prev = self.note_blocks[i - 1]
-			note_block.x = prev.x + prev.width
+		# TODO: make better
+		for note in self.note_blocks:
+			note.x -= 1
 
 		# update vertical position of each block
 		for i in range(len(self.note_blocks)):

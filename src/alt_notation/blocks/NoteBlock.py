@@ -29,7 +29,6 @@ class NoteBlock(pyglet.sprite.Sprite):
 		"""
 
 		self.note = note
-		print 'self.note:', self.note
 
 		# build an image for the block
 		pattern = pyglet.image.SolidColorImagePattern(color)
