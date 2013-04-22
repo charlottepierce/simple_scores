@@ -1,9 +1,12 @@
 import pyglet
 
+import block_util as util
 import lilypond as ly
 from alt_notation.blocks.NoteBlock import NoteBlock
 
 class BlockWindow(pyglet.window.Window):
+	LEFT_MARGIN = 50 # empty space to leave on the left
+
 	def __init__(self, width, height, note_sets):
 		"""Create a BlockWindow object.
 
@@ -28,7 +31,9 @@ class BlockWindow(pyglet.window.Window):
 		pyglet.window.Window.__init__(self, width=width, height=height, visible=False)
 
 		self.batch = pyglet.graphics.Batch() # batch renderer
+
 		self.note_sets = note_sets
+		self.note_blocks = util.create_note_blocks(self.batch, self.note_sets, semibreve_size=250.0)
 
 		pyglet.clock.schedule_interval(self.update, 1.0/60.0) # call update 60 times a second
 
@@ -53,6 +58,18 @@ class BlockWindow(pyglet.window.Window):
 
 		print 'Updating game window'
 		print 'dt:', dt
+
+		# update position of each block
+		for i in range(len(self.note_blocks)):
+			note_block = self.note_blocks[i]
+			# if first block, place at x = 0
+			if i == 0:
+				note_block.x = BlockWindow.LEFT_MARGIN
+				continue
+
+			# not first block - offset position with previous block
+			prev = self.note_blocks[i - 1]
+			note_block.x = prev.x + prev.width
 
 	def on_draw(self):
 		"""Window drawing.

@@ -3,6 +3,8 @@ import os
 import Tkinter as tk
 import Image, ImageTk
 
+import pyglet
+
 import gui
 import lilypond as ly
 import alt_notation.blocks as blocks
@@ -25,7 +27,7 @@ class ScoreViewer:
 
 		# Prepare for block notation, but do not display yet
 		# TODO: dynamically set window height according to score?
-		self.block_window = blocks.BlockWindow(width=500, height=500, note_sets=self.score_modifier.note_sets)
+		self.block_window = blocks.BlockWindow(width=1000, height=800, note_sets=self.score_modifier.note_sets)
 
 		self.root = tk.Tk()
 		self.viewed = False
@@ -102,6 +104,8 @@ class ScoreViewer:
 		"""Toggle the visibility of the block notation window."""
 
 		self.block_window.toggle_visibility()
+		if self.block_window.visible:
+			pyglet.app.run()
 
 	def reset_score(self, e, panel):
 		"""Reset the score - remove any spacing modifications and make all elements visible.
