@@ -59,7 +59,7 @@ class BlockWindow(pyglet.window.Window):
 		print 'Updating game window'
 		print 'dt:', dt
 
-		# update position of each block
+		# update horizontal position of each block
 		for i in range(len(self.note_blocks)):
 			note_block = self.note_blocks[i]
 			# if first block, place at x = 0
@@ -70,6 +70,22 @@ class BlockWindow(pyglet.window.Window):
 			# not first block - offset position with previous block
 			prev = self.note_blocks[i - 1]
 			note_block.x = prev.x + prev.width
+
+		# update vertical position of each block
+		for i in range(len(self.note_blocks)):
+			note_block = self.note_blocks[i]
+			# if first block, place in vertical centre
+			if i == 0:
+				note_block.y = self.height / 2
+				continue
+
+			# not first block - offset position with previous block
+			prev_block = self.note_blocks[i - 1]
+			if prev_block.note == None:
+				prev_block = self.note_blocks[i - 2]
+
+			pitch_diff = util.pitch_difference(prev_block, note_block)
+			note_block.y = prev_block.y + (pitch_diff * NoteBlock.HEIGHT)
 
 	def on_draw(self):
 		"""Window drawing.
