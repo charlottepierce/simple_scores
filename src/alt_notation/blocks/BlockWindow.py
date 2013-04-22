@@ -111,8 +111,28 @@ class BlockWindow(pyglet.window.Window):
 		"""
 
 		# update horizontal position of each block
-		self.note_blocks[0].x -= 1
-		self._propagate_x_locs()
+		x_change = 1
+
+		# apply horizontal change to all notes
+		for note_block in self.note_blocks:
+			note_block.x -= x_change
+
+		# change widths
+		for note_block in self.note_blocks:
+			if note_block.note == None:
+				continue
+
+			if note_block.x < BlockWindow.LEFT_MARGIN:
+				if note_block.width > x_change:
+					# apply the x change to the width, rather than the location
+					note_block.x += x_change
+					new_width = note_block.width - x_change
+					# generate and apply new sprite image
+					pattern = pyglet.image.SolidColorImagePattern((255, 255, 255, 255))
+					image = pyglet.image.create(new_width, NoteBlock.HEIGHT, pattern)
+					note_block.image = image
+				else:
+					note_block.visible = False
 
 		# update vertical position of each block
 		for i in range(len(self.note_blocks)):
@@ -129,23 +149,6 @@ class BlockWindow(pyglet.window.Window):
 
 			pitch_diff = util.pitch_difference(prev_block, note_block)
 			note_block.y = prev_block.y + (pitch_diff * NoteBlock.HEIGHT)
-
-	def _propagate_x_locs(self):
-		"""Offset positions of each block with the first.
-
-		Use this so you only have to update the first block excplicitly.
-
-		"""
-
-		for i in range(len(self.note_blocks)):
-			note_block = self.note_blocks[i]
-			# if first block, ignore
-			if i == 0:
-				continue
-
-			# not first block - offset position with previous block
-			prev = self.note_blocks[i - 1]
-			note_block.x = prev.x + prev.width
 
 	def on_draw(self):
 		"""Window drawing.
