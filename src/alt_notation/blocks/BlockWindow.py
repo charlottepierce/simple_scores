@@ -75,9 +75,8 @@ class BlockWindow(pyglet.window.Window):
 # 		print 'dt:', dt
 
 		# update horizontal position of each block
-		# TODO: make better
-# 		for note in self.note_blocks:
-# 			note.x -= 1
+		self.note_blocks[0].x -= 1
+		self._propagate_x_locs()
 
 		# update vertical position of each block
 		for i in range(len(self.note_blocks)):
@@ -94,6 +93,23 @@ class BlockWindow(pyglet.window.Window):
 
 			pitch_diff = util.pitch_difference(prev_block, note_block)
 			note_block.y = prev_block.y + (pitch_diff * NoteBlock.HEIGHT)
+
+	def _propagate_x_locs(self):
+		"""Offset positions of each block with the first.
+
+		Use this so you only have to update the first block excplicitly.
+
+		"""
+
+		for i in range(len(self.note_blocks)):
+			note_block = self.note_blocks[i]
+			# if first block, ignore
+			if i == 0:
+				continue
+
+			# not first block - offset position with previous block
+			prev = self.note_blocks[i - 1]
+			note_block.x = prev.x + prev.width
 
 	def on_draw(self):
 		"""Window drawing.
