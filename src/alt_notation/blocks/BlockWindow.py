@@ -71,13 +71,13 @@ class BlockWindow(pyglet.window.Window):
 				The number of seconds that have passed since the last update.
 		"""
 
-		print 'Updating game window'
-		print 'dt:', dt
+# 		print 'Updating game window'
+# 		print 'dt:', dt
 
 		# update horizontal position of each block
 		# TODO: make better
-		for note in self.note_blocks:
-			note.x -= 1
+# 		for note in self.note_blocks:
+# 			note.x -= 1
 
 		# update vertical position of each block
 		for i in range(len(self.note_blocks)):

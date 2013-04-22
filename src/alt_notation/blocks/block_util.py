@@ -42,7 +42,6 @@ def create_note_blocks(batch, note_sets, semibreve_size=100.0):
 	return result
 
 # TODO: make aware of key
-# TODO: sharps/flats
 def pitch_difference(prev_note, next_note):
 	"""Calculate the pitch difference moving between two notes.
 
@@ -74,6 +73,7 @@ def pitch_difference(prev_note, next_note):
 
 	pitches = ('c', 'd', 'e', 'f', 'g', 'a', 'b')
 	octave_diff = 7
+	accidental_diff = 0.5
 
 	prev_index = pitches.index(prev_note.note.pitch)
 	next_index = pitches.index(next_note.note.pitch)
@@ -83,37 +83,49 @@ def pitch_difference(prev_note, next_note):
 	prev_octave = prev_note.note.octave
 	next_octave = next_note.note.octave
 
-	# same octave, nothing fancy needed
-	if prev_octave == next_octave:
-		return pitch_diff
-
 	# different octaves, account for difference
 	# one octave is 'blank'
 	if prev_octave == '':
 		if '\'' in next_octave:
-			return (octave_diff * len(next_octave)) + pitch_diff # next octave is higher
+			pitch_diff += (octave_diff * len(next_octave)) # next octave is higher
 		elif ',' in next_octave:
-			return (-1 * octave_diff * len(next_octave)) + pitch_diff # next octave is lower
+			pitch_diff += (-1 * octave_diff * len(next_octave)) # next octave is lower
 	elif next_octave == '':
 		if '\'' in prev_octave:
-			return (-1 * octave_diff * len(prev_octave)) + pitch_diff # previous octave was higher
+			pitch_diff += (-1 * octave_diff * len(prev_octave)) # previous octave was higher
 		elif ',' in prev_octave:
-			return (octave_diff * len(prev_octave)) + pitch_diff # previous octave was lower
+			pitch_diff += (octave_diff * len(prev_octave)) # previous octave was lower
 
 	# both are 'positive' octaves
 	if ('\'' in prev_octave) and ('\'' in next_octave):
-		return (octave_diff * (len(next_octave) - len(prev_octave))) + pitch_diff
+		pitch_diff += (octave_diff * (len(next_octave) - len(prev_octave)))
 	# both are 'negative' octaves
 	if (',' in prev_octave) and (',' in next_octave):
-		return (octave_diff * (len(prev_octave) - len(next_octave))) + pitch_diff
+		pitch_diff += (octave_diff * (len(prev_octave) - len(next_octave)))
 
 	# previous octave is negative, next is positive
 	if (',' in prev_octave) and ('\'' in next_octave):
-		return (octave_diff * (len(prev_octave) + len(next_octave))) + pitch_diff
+		pitch_diff += (octave_diff * (len(prev_octave) + len(next_octave)))
 	# previous octave is positive, next is negative
 	if ('\'' in prev_octave) and (',' in next_octave):
-		return (-1 * octave_diff * (len(prev_octave) + len(next_octave))) + pitch_diff
+		pitch_diff += (-1 * octave_diff * (len(prev_octave) + len(next_octave)))
 
-	# case not covered - shouldn't happen
-	return None
+	# account for accidentals
+	prev_acc = prev_note.note.accidental
+	next_acc = next_note.note.accidental
+
+	# previous note is sharp
+	if ('is' in prev_acc):
+		pitch_diff -= accidental_diff * prev_acc.count('is')
+	# previous note is flat
+	elif ('es' in prev_acc):
+		pitch_diff += accidental_diff * prev_acc.count('es')
+	# next note is sharp
+	if ('is' in next_acc):
+		pitch_diff += accidental_diff * next_acc.count('is')
+	# next note is flat
+	if ('es' in next_acc):
+		pitch_diff -= accidental_diff * next_acc.count('es')
+
+	return pitch_diff
 
