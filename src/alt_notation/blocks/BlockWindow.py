@@ -1,4 +1,5 @@
 import pyglet
+import pyglet.window.key as key
 
 import block_util as util
 import lilypond as ly
@@ -31,11 +32,15 @@ class BlockWindow(pyglet.window.Window):
 
 		pyglet.window.Window.__init__(self, width=width, height=height, visible=False)
 
+		self.paused = True
+		self.x_change = 1
+
 		# create note blocks and set up to draw
 		self.note_batch = pyglet.graphics.Batch() # batch renderer for note blocks
 		self.note_sets = note_sets
 		self.note_blocks = util.create_note_blocks(self.note_batch, self.note_sets, semibreve_size=250.0)
 		self._init_x_locs()
+		self._init_y_locs()
 
 		# create staff lines, set up to draw
 		self.staff_batch = pyglet.graphics.Batch() # batch renderer for staff lines
@@ -61,6 +66,24 @@ class BlockWindow(pyglet.window.Window):
 			# not first block - offset position with previous block
 			prev = self.note_blocks[i - 1]
 			note_block.x = prev.x + prev.width
+
+	def _init_y_locs(self):
+		"""Initialise the y locations for each note block."""
+
+		for i in range(len(self.note_blocks)):
+			note_block = self.note_blocks[i]
+			# if first block, place in vertical centre
+			if i == 0:
+				note_block.y = self.height / 2
+				continue
+
+			# not first block - offset position with previous block
+			prev_block = self.note_blocks[i - 1]
+			if prev_block.note == None:
+				prev_block = self.note_blocks[i - 2]
+
+			pitch_diff = util.pitch_difference(prev_block, note_block)
+			note_block.y = prev_block.y + (pitch_diff * NoteBlock.HEIGHT)
 
 	def _create_staff_lines(self, batch):
 		"""Create the staff lines for the score."""
@@ -108,14 +131,15 @@ class BlockWindow(pyglet.window.Window):
 		----
 			dt:
 				The number of seconds that have passed since the last update.
+
 		"""
 
-		# update horizontal position of each block
-		x_change = 1
+		if self.paused:
+			return
 
 		# apply horizontal change to all notes
 		for note_block in self.note_blocks:
-			note_block.x -= x_change
+			note_block.x -= self.x_change
 
 		# change widths
 		for note_block in self.note_blocks:
@@ -123,10 +147,10 @@ class BlockWindow(pyglet.window.Window):
 				continue
 
 			if note_block.x < BlockWindow.LEFT_MARGIN:
-				if note_block.width > x_change:
+				if note_block.width > self.x_change:
 					# apply the x change to the width, rather than the location
-					note_block.x += x_change
-					new_width = note_block.width - x_change
+					note_block.x += self.x_change
+					new_width = note_block.width - self.x_change
 					# generate and apply new sprite image
 					pattern = pyglet.image.SolidColorImagePattern((255, 255, 255, 255))
 					image = pyglet.image.create(new_width, NoteBlock.HEIGHT, pattern)
@@ -134,21 +158,20 @@ class BlockWindow(pyglet.window.Window):
 				else:
 					note_block.visible = False
 
-		# update vertical position of each block
-		for i in range(len(self.note_blocks)):
-			note_block = self.note_blocks[i]
-			# if first block, place in vertical centre
-			if i == 0:
-				note_block.y = self.height / 2
-				continue
+	def reset(self):
+		"""Reset the score."""
 
-			# not first block - offset position with previous block
-			prev_block = self.note_blocks[i - 1]
-			if prev_block.note == None:
-				prev_block = self.note_blocks[i - 2]
+		self.paused = True
+		self.x_change = 1
 
-			pitch_diff = util.pitch_difference(prev_block, note_block)
-			note_block.y = prev_block.y + (pitch_diff * NoteBlock.HEIGHT)
+		# delete note blocks
+		for note_block in self.note_blocks:
+			note_block.delete()
+
+		# recreate note blocks
+		self.note_blocks = util.create_note_blocks(self.note_batch, self.note_sets, semibreve_size=250.0)
+		self._init_x_locs()
+		self._init_y_locs()
 
 	def on_draw(self):
 		"""Window drawing.
@@ -166,4 +189,20 @@ class BlockWindow(pyglet.window.Window):
 
 		self.staff_batch.draw()
 		self.note_batch.draw()
+
+	def on_key_press(self, symbol, modifiers):
+		"""Key press handler."""
+
+		if symbol == key.ESCAPE:
+			self.set_visible(not self.visible)
+			self.paused = True
+			pyglet.app.exit()
+		elif symbol == key.SPACE:
+			self.paused = not self.paused
+		elif symbol == key.PLUS:
+			self.x_change += 1
+		elif symbol == key.MINUS:
+			self.x_change -= 1
+		elif symbol == key.R:
+			self.reset()
 
