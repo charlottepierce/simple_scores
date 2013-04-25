@@ -47,6 +47,8 @@ class ScoreViewer:
 		Should only be called once, before starting the GUI.
 
 		Key bindings:
+			Escape: close score window.
+
 			b: Toggle visibility of block notation.
 
 			r: Reset score (remove spacing modifications, add all articuation).
@@ -77,6 +79,8 @@ class ScoreViewer:
 		# Window close handler
 		self.root.protocol('WM_DELETE_WINDOW', self.__destroy)
 
+		# Key binding to close the window on escape.
+		self.root.bind('<Escape>', lambda event: self.__destroy())
 		# Key binding to toggle visibility block notation (b).
 		self.root.bind('b', lambda event: self.toggle_block_window())
 		# Key binding to reset (r) the score.
