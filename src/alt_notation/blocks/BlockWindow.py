@@ -7,7 +7,7 @@ from NoteBlock import NoteBlock
 from StaffLine import StaffLine
 
 class BlockWindow(pyglet.window.Window):
-	LEFT_MARGIN = 50 # empty space to leave on the left
+	LEFT_MARGIN = 80 # empty space to leave on the left
 
 	def __init__(self, width, height, note_sets):
 		"""Create a BlockWindow object.
@@ -35,17 +35,18 @@ class BlockWindow(pyglet.window.Window):
 		self.paused = True
 		self.x_change = 1
 		self.semibreve_ref = 250.0
+		self.display_algorithm = 'Cmajor'
 
 		# create note blocks and set up to draw
 		self.note_batch = pyglet.graphics.Batch() # batch renderer for note blocks
 		self.note_sets = note_sets
 		self.note_blocks = util.create_note_blocks(self.note_batch, self.note_sets, semibreve_size=self.semibreve_ref)
 		self._init_x_locs()
-		self._init_y_locs()
+		self._init_y_locs(self.display_algorithm)
 
 		# create staff lines, set up to draw
 		self.staff_batch = pyglet.graphics.Batch() # batch renderer for staff lines
-		self.staff_lines = self._create_staff_lines(self.staff_batch)
+		self.staff_lines = self._create_staff_lines(self.staff_batch, self.display_algorithm)
 
 		# create left margin line
 		pattern = pyglet.image.SolidColorImagePattern((215, 196, 196, 200))
@@ -68,7 +69,7 @@ class BlockWindow(pyglet.window.Window):
 			prev = self.note_blocks[i - 1]
 			note_block.x = prev.x + prev.width
 
-	def _init_y_locs(self):
+	def _init_y_locs(self, algorithm):
 		"""Initialise the y locations for each note block."""
 
 		for i in range(len(self.note_blocks)):
@@ -84,12 +85,20 @@ class BlockWindow(pyglet.window.Window):
 				prev_block = self.note_blocks[i - 2]
 
 			pitch_diff = util.pitch_difference(prev_block, note_block)
-			note_block.y = prev_block.y + (pitch_diff * NoteBlock.HEIGHT)
 
-	def _create_staff_lines(self, batch):
+			if algorithm == 'Cmajor':
+				note_block.y = prev_block.y + (pitch_diff * NoteBlock.HEIGHT)
+			elif (algorithm == 'chromatic-sharps') or (algorithm == 'chromatic-flats'):
+				note_block.y = prev_block.y + ((pitch_diff / 0.5) * NoteBlock.HEIGHT)
+
+	def _create_staff_lines(self, batch, algorithm):
 		"""Create the staff lines for the score."""
 
-		pitches = ('c', 'd', 'e', 'f', 'g', 'a', 'b')
+		pitches = ('c', 'd', 'e', 'f', 'g', 'a', 'b') # pitches for 'Cmajor' algorithm
+		if algorithm == 'chromatic-sharps':
+			pitches = ('c', 'c sharp', 'd', 'd sharp', 'e', 'f', 'f sharp', 'g', 'g sharp', 'a', 'a sharp', 'b')
+		elif algorithm == 'chromatic-flats':
+			pitches = ('c', 'd flat', 'd', 'e flat', 'e', 'f', 'g flat', 'g', 'a flat', 'a', 'b flat', 'b')
 
 		result = []
 		# Middle and above
@@ -172,7 +181,14 @@ class BlockWindow(pyglet.window.Window):
 		# recreate note blocks
 		self.note_blocks = util.create_note_blocks(self.note_batch, self.note_sets, semibreve_size=self.semibreve_ref)
 		self._init_x_locs()
-		self._init_y_locs()
+		self._init_y_locs(self.display_algorithm)
+
+		# delete staff lines
+		for staff_line in self.staff_lines:
+			staff_line.delete()
+
+		# recreate staff lines
+		self.staff_lines = self._create_staff_lines(self.staff_batch, self.display_algorithm)
 
 	def on_draw(self):
 		"""Window drawing.
@@ -206,6 +222,16 @@ class BlockWindow(pyglet.window.Window):
 
 			r: Reset score to beginning, movement speed of 1 pixel per second.
 
+			1: Use display algorithm 1 - Cmajor.
+				Each grid row is a note from the c major scale. Sharps and flats are dipslayed
+				as blocks overlapping two grid rows.
+			2: Use display algorithm 2 - Chromatic (sharps).
+				Each grid row is a note from the western chromatic scale.
+				'Black notes' are written as sharps.
+			3: Use display algorithm 3 - Chromatic (flats).
+				Each grid row is a note from the western chromatic scale.
+				'Black notes' are written as flats.
+
 		"""
 
 		if symbol == key.ESCAPE:
@@ -226,5 +252,14 @@ class BlockWindow(pyglet.window.Window):
 			self.semibreve_ref -= 5.0
 			self.reset()
 		elif symbol == key.R:
+			self.reset()
+		elif symbol == key._1:
+			self.display_algorithm = 'Cmajor'
+			self.reset()
+		elif symbol == key._2:
+			self.display_algorithm = 'chromatic-sharps'
+			self.reset()
+		elif symbol == key._3:
+			self.display_algorithm = 'chromatic-flats'
 			self.reset()
 
