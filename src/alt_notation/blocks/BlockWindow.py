@@ -34,11 +34,12 @@ class BlockWindow(pyglet.window.Window):
 
 		self.paused = True
 		self.x_change = 1
+		self.semibreve_ref = 250.0
 
 		# create note blocks and set up to draw
 		self.note_batch = pyglet.graphics.Batch() # batch renderer for note blocks
 		self.note_sets = note_sets
-		self.note_blocks = util.create_note_blocks(self.note_batch, self.note_sets, semibreve_size=250.0)
+		self.note_blocks = util.create_note_blocks(self.note_batch, self.note_sets, semibreve_size=self.semibreve_ref)
 		self._init_x_locs()
 		self._init_y_locs()
 
@@ -169,7 +170,7 @@ class BlockWindow(pyglet.window.Window):
 			note_block.delete()
 
 		# recreate note blocks
-		self.note_blocks = util.create_note_blocks(self.note_batch, self.note_sets, semibreve_size=250.0)
+		self.note_blocks = util.create_note_blocks(self.note_batch, self.note_sets, semibreve_size=self.semibreve_ref)
 		self._init_x_locs()
 		self._init_y_locs()
 
@@ -191,11 +192,26 @@ class BlockWindow(pyglet.window.Window):
 		self.note_batch.draw()
 
 	def on_key_press(self, symbol, modifiers):
-		"""Key press handler."""
+		"""Key press handler.
+
+		Keys:
+			Escape: close block notation window.
+
+			Space: pause/unpause movement.
+			+: Speed up movement by 1 pixel per second.
+			-: Slow down movement by 1 pixel per second.
+
+			i: Increase semibreve reference width by 5 pixels; reset score.
+			d: Decrease semibreve reference width by 5 pixels; reset score.
+
+			r: Reset score to beginning, movement speed of 1 pixel per second.
+
+		"""
 
 		if symbol == key.ESCAPE:
 			self.set_visible(not self.visible)
 			self.paused = True
+			self.reset()
 			pyglet.app.exit()
 		elif symbol == key.SPACE:
 			self.paused = not self.paused
@@ -203,6 +219,12 @@ class BlockWindow(pyglet.window.Window):
 			self.x_change += 1
 		elif symbol == key.MINUS:
 			self.x_change -= 1
+		elif symbol == key.I:
+			self.semibreve_ref += 5.0
+			self.reset()
+		elif symbol == key.D:
+			self.semibreve_ref -= 5.0
+			self.reset()
 		elif symbol == key.R:
 			self.reset()
 
